@@ -1,0 +1,32 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Department = the part of the login email before "@", e.g. store@ronch-floor.app -> "store"
+    function dept() { return request.auth.token.email.split('@')[0]; }
+    function signedIn() { return request.auth != null && request.auth.token.email != null; }
+    function by(list) { return signedIn() && (dept() == 'admin' || dept() in list); }
+
+    // Everyone signed in can read everything
+    match /{document=**} { allow read: if signedIn(); }
+
+    // Who may change what
+    match /pf_orders/{id}     { allow write: if by(['sales']); }
+    match /pf_clients/{id}    { allow write: if by(['sales']); }
+    match /pf_pos/{id}        { allow write: if by(['scm', 'store']); }
+    match /pf_meta/{id}       { allow write: if by(['scm']); }
+    match /pf_grns/{id}       { allow write: if by(['store']); }
+    match /pf_issues/{id}     { allow write: if by(['store']); }
+    match /pf_cmoves/{id}     { allow write: if by(['store']); }
+    match /pf_wos/{id}        { allow write: if by(['production', 'sales']); }
+    match /pf_logs/{id}       { allow write: if by(['production']); }
+    match /pf_returns/{id}    { allow write: if by(['production']); }
+    match /pf_fg/{id}         { allow write: if by(['production', 'dispatch']); }
+    match /pf_dispatches/{id} { allow write: if by(['dispatch']); }
+    match /pf_kits/{id}       { allow write: if by(['rnd']); }
+    match /pf_products/{id}   { allow write: if by(['rnd']); }
+    match /pf_components/{id} { allow write: if by(['rnd']); }
+    match /pf_boms/{id}       { allow write: if by(['rnd']); }
+    match /pf_mods/{id}       { allow write: if by(['rnd']); }
+  }
+}
