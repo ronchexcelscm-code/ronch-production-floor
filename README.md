@@ -98,8 +98,9 @@ The app greys out buttons that belong to other departments, and the Firebase rul
 
 ## Passwords
 
-- Admin can reset any department's password: Firebase **Authentication → Users → ⋮ → Reset password** (or delete the user and add it again with a new password).
-- To stop someone who has left, change that department's password.
+- **Change your department's password (in the app):** sign in, tap **Password** at the top, enter the current password and the new one twice (at least 6 characters). The change applies to everyone who uses that department login, so tell them the new password.
+- **Forgotten password (Admin, in Firebase):** the login emails are not real mailboxes, so "Reset password" emails from Firebase never arrive. Instead: Firebase console → **Authentication → Users** → find the user (e.g. `store@ronch-floor.app`) → ⋮ → **Delete account**, then **Add user** with the same email and a new password. No data is lost; the app only looks at the department name in the email.
+- To lock out someone who has left, change that department's password.
 
 ## Install on phones
 
