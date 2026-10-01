@@ -67,7 +67,11 @@ The app greys out buttons that belong to other departments, and the Firebase rul
 1. Open the address, tap your department and enter its password.
 2. Load the data in **Masters → Data import**. There are three separate Excel imports; each checks every row and shows a summary before saving, and none of them deletes anything:
    1. **Components (component-wise)**: Description, Category, Unit, Min Stock, Stock Qty, Remarks, Preferred Make and Alternate Make 1, 2, 3 (add columns Alternate Make 4, 5 … for more). Part No. is optional: left blank, the app numbers it from the category (PCB-0001, MOV-0001, MOS-0001, ECAP-0001 …). Existing components are matched by Part No., or by Description, and blank cells keep the current value, so makes can be filled in later. R&D imports the master, Store imports stock, Admin both.
-   2. **Models & BOMs (in the app)**: R&D adds each model (**+ Add model**) and then its BOM (**+ New BOM**): select the Model No., the BOM No. is generated automatically (BOM-100W-C7-R0, next revision R1 …) and the BOM name is filled from the model. For each line type the Part No. or part of the description, the Specification fills from the component master (editable), then Qty / unit, Ref. des. and Remarks.
+   2. **Models & BOMs (in the app)**: R&D adds each model (**+ Add model**) and then its BOM (**+ New BOM**). Choose the **BOM type**:
+      - **Main BOM**: select the Model No.; the BOM No. is generated (BOM-100W-C7-R0, next revision R1 …). The Released main BOM is what planning and issue use.
+      - **Sub BOM**: select the Main BOM it belongs to (no model choice; it takes the main BOM's model). The main BOM's lines are copied in; change only what differs (parts, qty, specification). Number: BOM-100W-C7-R0-S1, S2 … The form shows the changes against the main BOM as you type. A work order can be set to build to a sub BOM (WO → Change BOM / modification), and Store then issues per the sub BOM.
+      - **PDF of a sub BOM** = the complete main BOM, then the sub BOM with a table of changes against the main BOM and its complete list (changed lines shaded).
+      For each line type the Part No. or part of the description; Specification fills from the component master (editable).
    3. **Opening balances**: clients and sub-vendors, WIP on the floor, FG stock per model, open component POs. Admin.
 3. Components can also be added one by one in **R&D / BOM → + Add component**, with **+ Add alternate make** for as many alternates as needed.
 
