@@ -67,7 +67,7 @@ The app greys out buttons that belong to other departments, and the Firebase rul
 1. Open the address, tap your department and enter its password.
 2. Load the data in **Masters → Data import**. There are three separate Excel imports; each checks every row and shows a summary before saving, and none of them deletes anything:
    1. **Components (component-wise)**: Description, Category, Unit, Min Stock, Stock Qty, Remarks, Preferred Make and Alternate Make 1, 2, 3 (add columns Alternate Make 4, 5 … for more). Part No. is optional: left blank, the app numbers it from the category (PCB-0001, MOV-0001, MOS-0001, ECAP-0001 …). Existing components are matched by Part No., or by Description, and blank cells keep the current value, so makes can be filled in later. R&D imports the master, Store imports stock, Admin both.
-   2. **Models & BOMs (model-wise)**: Models sheet plus BOM sheet (Model, Component Description or Part No., Qty per unit). The template downloaded from the app contains the current models, BOM lines and component list. R&D or Admin.
+   2. **Models & BOMs (in the app)**: R&D adds each model (**+ Add model**) and then its BOM (**+ New BOM**): select the Model No., the BOM No. is generated automatically (BOM-100W-C7-R0, next revision R1 …) and the BOM name is filled from the model. For each line type the Part No. or part of the description, the Specification fills from the component master (editable), then Qty / unit, Ref. des. and Remarks.
    3. **Opening balances**: clients and sub-vendors, WIP on the floor, FG stock per model, open component POs. Admin.
 3. Components can also be added one by one in **R&D / BOM → + Add component**, with **+ Add alternate make** for as many alternates as needed.
 
