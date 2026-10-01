@@ -64,10 +64,12 @@ The app greys out buttons that belong to other departments, and the Firebase rul
 
 ## Step 3: Start using it
 
-1. Open the address, choose **Admin**, and enter the admin password. The header should show **Live · shared** and **Admin**.
-2. Dashboard → **Start here** → **Download import template** → fill it in → **Import opening data (Excel)**.
-   The template has sheets for Models, Components (with stock), BOM (one row per model × part), Clients, WIP, FG Stock and Open POs (one row per PO line).
-3. Anything left out can be added later in the app: R&D adds models, components and BOMs; Store corrects stock with **Stock in / out** or a stock import.
+1. Open the address, tap your department and enter its password.
+2. Load the data in **Masters → Data import**. There are three separate Excel imports; each checks every row and shows a summary before saving, and none of them deletes anything:
+   1. **Components (component-wise)**: Description, Category, Unit, Min Stock, Stock Qty, Remarks, Preferred Make and Alternate Make 1, 2, 3 (add columns Alternate Make 4, 5 … for more). Part No. is optional: left blank, the app numbers it from the category (PCB-0001, MOV-0001, MOS-0001, ECAP-0001 …). Existing components are matched by Part No., or by Description, and blank cells keep the current value, so makes can be filled in later. R&D imports the master, Store imports stock, Admin both.
+   2. **Models & BOMs (model-wise)**: Models sheet plus BOM sheet (Model, Component Description or Part No., Qty per unit). The template downloaded from the app contains the current models, BOM lines and component list. R&D or Admin.
+   3. **Opening balances**: clients and sub-vendors, WIP on the floor, FG stock per model, open component POs. Admin.
+3. Components can also be added one by one in **R&D / BOM → + Add component**, with **+ Add alternate make** for as many alternates as needed.
 
 ## How the material flow works
 
