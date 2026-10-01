@@ -1,6 +1,6 @@
 # Ronch Production Floor
 
-LED driver SKD kit flow: client orders from sub-vendors, SCM (China POs), RM Store, Production (4 test stages), Dispatch, Forecast, daily Reports, **R&D (components, BOMs, BOM modifications)** and Excel/PDF export.
+LED driver flow by **model and component-level BOM**: client orders from sub-vendors, SCM (multi-line component POs), Store (GRN and BOM-based issue to work orders), Production (4 test stages), Dispatch, Forecast, daily Reports, **R&D (components, BOMs, BOM modifications)** and Excel/PDF export.
 It is one web page. It runs on GitHub Pages and keeps its data in a free Firebase (Firestore) database that the whole team shares.
 
 ## Departments and what each can change
@@ -11,11 +11,11 @@ Everyone can **view** everything. Each department **edits only its own work**. *
 |---|---|---|
 | `admin` | Admin | Everything, including opening-data import and "Delete all data" |
 | `sales` | Client Order | Sub-vendor POs (client orders), price & specification, clients & sub-vendors |
-| `scm` | SCM | China POs and their status, forecast |
-| `store` | Store | GRN / receiving, kit issues, component stock in/out, component stock import |
+| `scm` | SCM | Component POs (one supplier, many lines) and their status, forecast |
+| `store` | Store | GRN against PO lines (part receipts), component issue to WOs per BOM, stock in/out, stock import |
 | `production` | Production | Work orders (clubbing), stage output, rejects, FG handover, which BOM/modification a WO is built to |
-| `dispatch` | Dispatch | Dispatches, invoices/dockets, splitting opening FG by print version |
-| `rnd` | R&D | Kit models, component master, BOMs, BOM modifications, component master import |
+| `dispatch` | Dispatch | Dispatches to sub-vendors, invoices/dockets |
+| `rnd` | R&D | Models (each version, e.g. 100W-C7 and 100W-B7, is its own model), component master, BOMs, BOM modifications, component master import |
 
 The app greys out buttons that belong to other departments, and the Firebase rules (`firestore.rules`) block such changes on the server too.
 
@@ -66,14 +66,22 @@ The app greys out buttons that belong to other departments, and the Firebase rul
 
 1. Open the address, choose **Admin**, and enter the admin password. The header should show **Live · shared** and **Admin**.
 2. Dashboard → **Start here** → **Download import template** → fill it in → **Import opening data (Excel)**.
-3. R&D signs in and adds the component master (one by one, or **R&D / BOM → Import (Excel)**, using **Export (Excel)** as the template), then creates BOMs.
-4. Store signs in and sets component stock (**Stock in / out**, or import with the Stock Qty column).
+   The template has sheets for Models, Components (with stock), BOM (one row per model × part), Clients, WIP, FG Stock and Open POs (one row per PO line).
+3. Anything left out can be added later in the app: R&D adds models, components and BOMs; Store corrects stock with **Stock in / out** or a stock import.
+
+## How the material flow works
+
+1. **Sales** enters sub-vendor POs by model. **Production / Sales** clubs pending lines of a model into a work order (WO).
+2. **SCM → Component requirement (MRP)** explodes open WOs and unplanned orders through each model's released BOM and compares with stock, open POs and in-transit. **New PO → shortages** fills a PO with everything short.
+3. A **PO** is one supplier with many component lines. SCM moves it Ordered → Shipped → At Port / Customs. **Store** receives it with a **GRN**, line by line; part receipts are allowed and the PO stays open until everything arrives or SCM closes it.
+4. **Store → Issue** picks a WO and the number of units; the app works out each component (BOM qty × units, including any BOM modification the WO is built to), shows stock and shortages, and deducts stock on issue. A WO can be issued in several parts.
+5. **Production** logs the 4 test stages for the units issued, then hands FG over to **Dispatch**, who dispatches to each sub-vendor.
 
 ## Orders tab (search & filter)
 
-- **Search:** SO no., sub-vendor PO no., client, sub-vendor, city, product, kit, specification, invoice or docket. Several words must all match (e.g. `sai 100W dimming`).
-- **Filters** (combine freely): client, sub-vendor, customer code, kit model, product, order status (incl. overdue / due in 7 days), line delivery (not started / part / delivered / anything pending), specification yes/no, price entered/missing, PO date range, due date range.
-- **Views:** one row per product line or one row per order; group lines by client, sub-vendor, product, kit, PO month, due month or status (with subtotals).
+- **Search:** SO no., sub-vendor PO no., client, sub-vendor, city, model, category, specification, invoice or docket. Several words must all match (e.g. `sai 100W dimming`).
+- **Filters** (combine freely): client, sub-vendor, customer code, category (Driver / SPD / Other), model, order status (incl. overdue / due in 7 days), line delivery (not started / part / delivered / anything pending), specification yes/no, price entered/missing, PO date range, due date range.
+- **Views:** one row per product line or one row per order; group lines by client, sub-vendor, model, category, PO month, due month or status (with subtotals).
 - **Totals** at the top: orders, lines, PO qty, delivered, pending, value, pending value. **Export these to Excel** exports exactly the filtered list.
 - On phones the filters fold under **Filters**; tap to open.
 
@@ -81,7 +89,8 @@ The app greys out buttons that belong to other departments, and the Firebase rul
 
 - **Component master:** part no., description, category, make, value/spec, package, unit, min stock. R&D edits it; Store keeps the stock (movements are logged).
 - **Import / export:** one Excel sheet. R&D import updates the master fields. Store import sets stock to the Stock Qty column (the difference is logged). Admin import does both.
-- **BOM:** per kit model (optionally per print version), with revision and status Draft / Released / Obsolete. Lines can be imported from Excel (Part No., Qty, Ref. des., Remarks). **New revision** copies a BOM to R1, R2…
+- **Models:** R&D adds each sellable version as a model. When adding a model you can copy the BOM of a similar one (e.g. start 100W-B7 from 100W-C7) as a draft.
+- **BOM:** one per model, with revision and status Draft / Released / Obsolete. Lines can be imported from Excel (Part No., Qty, Ref. des., Remarks). **New revision** copies a BOM to R1, R2…
 - **Modification:** a small change linked to a main BOM (Add / Remove / Replace / Change qty). **PDF (BOM + changes)** gives one PDF with the full main BOM, the modification list and the resulting BOM (changed lines highlighted), plus signature boxes.
 - **Production:** each work order shows its BOM (and selected modification) and the component requirement against stock, with shortages flagged.
 
@@ -116,7 +125,7 @@ Use **Export all (Excel)** regularly and keep the file. **Masters → Delete all
 
 ## Where the data lives (cloud only)
 
-- **All business data is in the Firebase Firestore cloud database only** (Google Cloud, Mumbai region asia-south1). This covers kits, stock, orders, POs, WOs, dispatches, components, BOMs and forecast.
+- **All business data is in the Firebase Firestore cloud database only** (Google Cloud, Mumbai region asia-south1). This covers models, components, stock, orders, POs, WOs, dispatches, components, BOMs and forecast.
 - **Nothing is saved on phones or PCs.** The app keeps data only in memory while the page is open (no offline copy on the device). Closing the tab leaves no data behind.
 - **GitHub holds only the app's code**, never data. A public repository is safe in that sense.
 - **What the browser remembers:** only the login session (so users don't retype the password every time), the last department picked, the last open tab and the name typed in the header. None of this is business data.
