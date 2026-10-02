@@ -70,7 +70,7 @@ The app greys out buttons that belong to other departments, and the Firebase rul
    2. **Models & BOMs (in the app)**: R&D adds each model (**+ Add model**) and then its BOM (**+ New BOM**). Choose the **BOM type**:
       - **Main BOM**: select the Model No.; the BOM No. is generated (BOM-100W-C7-R0, next revision R1 …). The Released main BOM is what planning and issue use.
       - **Sub BOM**: select the Main BOM it belongs to (no model choice; it takes the main BOM's model). The main BOM's lines are copied in; change only what differs (parts, qty, specification). Number: BOM-100W-C7-R0-S1, S2 … The form shows the changes against the main BOM as you type. A work order can be set to build to a sub BOM (WO → Change BOM / modification), and Store then issues per the sub BOM.
-      - **PDF of a sub BOM** = the complete main BOM, then the sub BOM with a table of changes against the main BOM and its complete list (changed lines shaded).
+      - **PDF of a sub BOM**: first the **Sub BOM** – only the components added (or replacing a main-BOM part) and the qty / specification changes; below it the **complete main BOM** with the lines this sub BOM changes highlighted (red = removed / replaced, amber = qty or specification changed) and a "Change in sub BOM" column.
       For each line type the Part No. or part of the description; Specification fills from the component master (editable).
    3. **Opening balances**: clients and sub-vendors, WIP on the floor, FG stock per model, open component POs. Admin.
 3. Components can also be added one by one in **R&D / BOM → + Add component**, with **+ Add alternate make** for as many alternates as needed.
