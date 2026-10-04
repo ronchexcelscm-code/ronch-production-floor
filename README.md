@@ -83,6 +83,14 @@ The app greys out buttons that belong to other departments, and the Firebase rul
 4. **Store → Issue** picks a WO and the number of units; the app works out each component (BOM qty × units, including any BOM modification the WO is built to), shows stock and shortages, and deducts stock on issue. A WO can be issued in several parts.
 5. **Production** logs the 4 test stages for the units issued, then hands FG over to **Dispatch**, who dispatches to each sub-vendor.
 
+## Forecast (in kits)
+
+- Enter the average monthly sales per model and the number of months. The forecast is in **kits** (one kit = one driver's components as per its BOM).
+- **Kits needed** = the higher of forecast (avg × months) and open orders, minus FG and WIP.
+- **Kits in store** = complete sets that the components already in store or on order can make (the count most of the BOM lines reach). **Kits to order** = kits needed − kits in store.
+- **Shortage – buy loose**: components missing to complete the kits in store. Order them separately (**Raise PO for these**); the new kits do not cover them.
+- **Excess – do not order again**: components left over. If a model is listed, the kits you order for it bring this part again, so ask the supplier to leave it out or reduce it to avoid over-stocking.
+
 ## Orders tab (search & filter)
 
 - **Search:** SO no., sub-vendor PO no., client, sub-vendor, city, model, category, specification, invoice or docket. Several words must all match (e.g. `sai 100W dimming`).
