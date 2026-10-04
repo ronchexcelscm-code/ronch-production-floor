@@ -83,6 +83,12 @@ The app greys out buttons that belong to other departments, and the Firebase rul
 4. **Store → Issue** picks a WO and the number of units; the app works out each component (BOM qty × units, including any BOM modification the WO is built to), shows stock and shortages, and deducts stock on issue. A WO can be issued in several parts.
 5. **Production** logs the 4 test stages for the units issued, then hands FG over to **Dispatch**, who dispatches to each sub-vendor.
 
+## Clients & sub-vendors
+
+- Customer code: **C** = Crompton, **B** = Bajaj, **E** = every other customer. The app sets it from the client name. E clients can order any model; C and B clients see their own models plus general ones (e.g. SPD).
+- A client without a sub-vendor is its own sub-vendor (added automatically).
+- **Masters → Clients & sub-vendors → Import (Excel)** (Client Order or Admin): columns Client Name, Customer Code, Sub-vendor, City. New clients and sub-vendors are added; nothing is deleted.
+
 ## Forecast (in kits)
 
 - Enter the average monthly sales per model and the number of months. The forecast is in **kits** (one kit = one driver's components as per its BOM).
