@@ -13,7 +13,8 @@ Everyone can **view** everything. Each department **edits only its own work**. *
 | `sales` | Client Order | Sub-vendor POs (client orders), price & specification, clients & sub-vendors |
 | `scm` | SCM | Component POs (one supplier, many lines) and their status, forecast |
 | `store` | Store | GRN against PO lines (part receipts), component issue to WOs per BOM, stock in/out, stock import |
-| `production` | Production | Work orders (clubbing), stage output, rejects, FG handover, which BOM/modification a WO is built to |
+| `production` | Production | Work orders (clubbing), stage output incl. Packing, Rework, FG handover, which BOM a WO is built to |
+| `quality` | Quality | Incoming inspection (IQC) of GRNs, outgoing quality check (OQC) of packed drivers, BOM approval |
 | `dispatch` | Dispatch | Dispatches to sub-vendors, invoices/dockets |
 | `rnd` | R&D | Models (each version, e.g. 100W-C7 and 100W-B7, is its own model), component master, BOMs, BOM modifications, component master import |
 
@@ -37,7 +38,7 @@ The app greys out buttons that belong to other departments, and the Firebase rul
 3. **Build → Firestore Database → Create database**. Location **asia-south1 (Mumbai)**, **production mode**.
 4. On the **Rules** tab, paste the whole of `firestore.rules` and click **Publish**.
 5. **Build → Authentication → Get started → Sign-in method → Email/Password → Enable → Save**. (If Anonymous is enabled from an earlier setup, disable it.)
-6. **Authentication → Users → Add user**. Create these 7 users, giving each its own password:
+6. **Authentication → Users → Add user**. Create these 8 users, giving each its own password:
 
    | Email | Department |
    |---|---|
@@ -48,6 +49,7 @@ The app greys out buttons that belong to other departments, and the Firebase rul
    | `production@ronch-floor.app` | Production |
    | `dispatch@ronch-floor.app` | Dispatch |
    | `rnd@ronch-floor.app` | R&D |
+   | `quality@ronch-floor.app` | Quality |
 
    These are login names only; no email is ever sent to them. Keep the passwords safe and give each department only its own.
 7. **Project settings (gear) → Your apps → </> Web**. Register the app `ronch-floor` (no Hosting). Copy the six `firebaseConfig` values into `firebase-config.js`.
@@ -82,6 +84,16 @@ The app greys out buttons that belong to other departments, and the Firebase rul
 3. A **PO** is one supplier with many component lines. SCM moves it Ordered → Shipped → At Port / Customs. **Store** receives it with a **GRN**, line by line; part receipts are allowed and the PO stays open until everything arrives or SCM closes it.
 4. **Store → Issue** picks a WO and the number of units; the app works out each component (BOM qty × units, including any BOM modification the WO is built to), shows stock and shortages, and deducts stock on issue. A WO can be issued in several parts.
 5. **Production** logs the 4 test stages for the units issued, then hands FG over to **Dispatch**, who dispatches to each sub-vendor.
+
+## Production, Rework and Quality
+
+- Stages: PCBA Test → Hi-pot & Ground → Ageing → Final Test → **Packing** → **Quality OQC** → handover to Dispatch. Only packed drivers approved by Quality can be handed over and dispatched.
+- **Rework**: drivers failed at any stage (or rejected at OQC) go to Rework. Production records *Reworked OK* (they go back to PCBA Test) or *Scrap*, with the fault found.
+- **Quality approvals** (Quality tab):
+  1. **Incoming inspection (IQC)**: every GRN stays on *QC hold* until Quality accepts / rejects each line. Only accepted qty becomes stock; rejected qty is listed for return to the supplier.
+  2. **Outgoing quality check (OQC)**: packed drivers are approved (→ FG handover) or rejected (→ Rework).
+  3. **BOM approval**: R&D saves a BOM as Draft and clicks *Submit to Quality*; Quality approves (released) or rejects (back to Draft with the reason). Changing a released BOM sends it back for approval. Admin can release directly.
+- **Duplicate BOM** (R&D): *Duplicate* on any BOM, or *Start from an existing BOM* in New BOM, copies all lines; choose the model and change what differs.
 
 ## Clients & sub-vendors
 
